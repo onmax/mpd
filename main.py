@@ -26,7 +26,7 @@ if __name__ == '__main__':
             sys.exit()
 
         content = get_content(sys.argv[1])
-        stats.get_nmessages(content)
+        stats.main(content)
 
     else:
         print("You must enter a file path as an argument")
