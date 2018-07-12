@@ -1,6 +1,8 @@
 import os.path
 import sys
-import stats
+
+import users
+import metadata_chat
 
 # Returns the content of the file path
 
@@ -26,7 +28,8 @@ if __name__ == '__main__':
             sys.exit()
 
         content = get_content(sys.argv[1])
-        stats.main(content)
+        metadata_chat.main(content)
+        #users.main(content)
 
     else:
         print("You must enter a file path as an argument")
