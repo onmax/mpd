@@ -17,6 +17,8 @@ def get_users(content):
 def get_gender(name):
     url = 'https://api.genderize.io/?name=' + name
     r = requests.get(url=url)
+    if r.json()['gender'] is None:
+        return 'Not identified'
     return r.json()['gender']
 
 
@@ -39,11 +41,11 @@ def get_nfiles(messages):
             n += 1
     return n
 
-# Get the number of files sent every 100 messages
+# Get the number of elem(files or links) sent every 100 messages
 
 
-def get_ratio_files_and_messages(n_messages, n_files):
-    return n_files * 100 / n_messages
+def get_ratio(n_messages, elem):
+    return elem * 100 / n_messages
 
 # Get the most common word of a user
 
@@ -70,7 +72,7 @@ def print_info(users):
     print('Number of messages:')
     for user in users:
         print('\t' + user + '(' + users[user]['gender'] + '): ' + str(users[user]['n_messages']) +
-              ". Most common message: " + users[user]['most_common_word'])
+              ". Most common message: " + str(users[user]['most_common_word']))
 
     print('\n')
     print('Number of files sent:')
@@ -83,7 +85,9 @@ def print_info(users):
 
     print('Number of links sent:')
     for user in users:
-        print('\t' + user + ': ' + str(users[user]['nlinks']))
+        print('\t' + user + ': ' + str(users[user]['nlinks']) +
+              '. Ratio: ' +
+              str(round(users[user]['ratio_links_and_messages'], 2)) + " %")
 
     print('\n')
 
@@ -99,20 +103,24 @@ def main(content):
             most_common_words = ''
             nlinks = 0
         else:
-            n_files = get_nfiles(messages)
-            ratio_files_and_messages = get_ratio_files_and_messages(
-                n_messages, n_files)
             most_common_words = get_most_common_words(messages)
+
+            n_files = get_nfiles(messages)
+            ratio_files_and_messages = get_ratio(n_messages, n_files)
+
             nlinks = get_nlinks(messages)
+            ratio_links_and_messages = get_ratio(n_messages, nlinks)
 
         users[user] = {
             'gender': gender,
             'messages': messages,
             'n_messages': n_messages,
+            'most_common_word': most_common_words,
             'n_files': n_files,
             'ratio_files_and_messages': ratio_files_and_messages,
-            'most_common_word': most_common_words,
-            'nlinks': nlinks
+            'nlinks': nlinks,
+            'ratio_links_and_messages': ratio_links_and_messages,
+
         }
 
     print_info(users)
