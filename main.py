@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
         content = get_content(sys.argv[1])
         metadata_chat.main(content)
-        #users.main(content)
+        users.main(content)
 
     else:
         print("You must enter a file path as an argument")
