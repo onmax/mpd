@@ -16,12 +16,30 @@ def get_users(content):
     return users
 
 
-def get_gender(name):
-    url = 'https://api.genderize.io/?name=' + name
-    r = requests.get(url=url)
-    if r.json()['gender'] is None:
-        return 'Not identified'
-    return r.json()['gender']
+def get_gender(users):
+    genders = []
+    urls = []
+
+    for i in range(len(users)):
+        api_str = ''
+        for j in range(10):
+            index = i * 10 + j
+            if index >= len(users):
+                break
+            api_str += 'name=' + list(users)[index] + '&'
+        urls.append('https://api.genderize.io/?' + api_str)
+        if index >= len(users):
+            break
+    for url in urls:
+        json = requests.get(url=url).json()
+
+        for r in json:
+            if(r['gender'] != None):
+                genders.append(r['gender'])
+            else:
+                genders.append('Not identified')
+
+    return genders
 
 
 def get_messages(content, user):
@@ -114,13 +132,13 @@ def print_info_pretty(users):
     print(tabulate(all_users, headers=headers, tablefmt="grid"))
     print('\n\tMCM: Most common word.')
     print('\tMPD: Messages per day.')
-    print('\% Files and % Links: Files and/or links sent every 100 messages.\n')
+    print('\t% Files and % Links: Files and/or links sent every 100 messages.\n\n')
 
 
 def main(content, metadata):
     users = get_users(content)
-    for user in users:
-        gender = get_gender(user)
+    genders = get_gender(users)
+    for i, user in enumerate(users):
         messages = get_messages(content, user)
         n_messages = len(messages)
         if(n_messages == 0):
@@ -140,7 +158,7 @@ def main(content, metadata):
             mpd = get_mpd(n_messages, metadata['days'])
 
         users[user] = {
-            'gender': gender,
+            'gender': genders[i],
             'messages': messages,
             'n_messages': n_messages,
             'most_common_word': most_common_words,
