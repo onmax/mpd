@@ -31,3 +31,4 @@ def main(content):
         'nmessages': len(content)
     }
     print(metadata)
+    return metadata

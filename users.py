@@ -1,6 +1,8 @@
 import re
 import requests
 
+from tabulate import tabulate
+
 
 def get_users(content):
     users = {}
@@ -59,40 +61,60 @@ def get_most_common_words(messages):
 
 
 def get_nlinks(messages):
-    nlinks = 0
+    n_links = 0
     for m in messages:
         n = re.findall(
             'http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[\/.?&+!*=\-])+(?![^,!;:\s)])', m)
-        nlinks = nlinks + len(n)
-    return nlinks
+        n_links = n_links + len(n)
+    return n_links
+
+
+def get_mpd(n, days):
+    return n / days
 
 
 def print_info(users):
     print('\n')
     print('Number of messages:')
     for user in users:
-        print('\t' + user + '(' + users[user]['gender'] + '): ' + str(users[user]['n_messages']) +
-              ". Most common message: " + str(users[user]['most_common_word']))
-
-    print('\n')
-    print('Number of files sent:')
-    for user in users:
-        print('\t' + user + ': ' + str(users[user]['n_files']) +
-              '. Ratio: ' +
+        print('\t' + user + '(' + users[user]['gender'] + '): ')
+        print('\t\t' + 'Messages: ' + str(users[user]['n_messages']))
+        print('\t\t' + 'Most common word: ' +
+              str(users[user]['most_common_word']))
+        print('\t\t' + 'MPD: ' + str(users[user]['mpd']))
+        print('\t\t' + 'Files sent: ' + str(users[user]['n_files']))
+        print('\t\t' + 'Files sent every 100 messages: ' +
               str(round(users[user]['ratio_files_and_messages'], 2)) + " %")
 
-    print('\n')
-
-    print('Number of links sent:')
-    for user in users:
-        print('\t' + user + ': ' + str(users[user]['nlinks']) +
-              '. Ratio: ' +
+        print('\t\t' + 'Links sent: ' + str(users[user]['n_links']))
+        print('\t\t' + 'Links sent every 100 messages: ' +
               str(round(users[user]['ratio_links_and_messages'], 2)) + " %")
 
-    print('\n')
+        print('\n')
 
 
-def main(content):
+def print_info_pretty(users):
+    all_users = []
+    for user in users:
+        all_users.append([
+            user,
+            users[user]['gender'],
+            str(users[user]['n_messages']),
+            str(users[user]['most_common_word']),
+            str(round(users[user]['mpd'], 4)),
+            str(users[user]['n_files']),
+            str(round(users[user]['ratio_files_and_messages'], 2)),
+            str(users[user]['n_links']),
+            str(round(users[user]['ratio_links_and_messages'], 2))
+        ])
+
+    headers = [
+        'User', 'Gender', 'Messages', 'MCM', 'MPD', 'Files', '% Files', 'Links', '% Links'
+    ]
+    print(tabulate(all_users, headers=headers, tablefmt="grid"))
+
+
+def main(content, metadata):
     users = get_users(content)
     for user in users:
         gender = get_gender(user)
@@ -101,15 +123,18 @@ def main(content):
         if(n_messages == 0):
             n_files = ratio_files_and_messages = 0
             most_common_words = ''
-            nlinks = 0
+            n_links = 0
+            mpd = 0
         else:
             most_common_words = get_most_common_words(messages)
 
             n_files = get_nfiles(messages)
             ratio_files_and_messages = get_ratio(n_messages, n_files)
 
-            nlinks = get_nlinks(messages)
-            ratio_links_and_messages = get_ratio(n_messages, nlinks)
+            n_links = get_nlinks(messages)
+            ratio_links_and_messages = get_ratio(n_messages, n_links)
+
+            mpd = get_mpd(n_messages, metadata['days'])
 
         users[user] = {
             'gender': gender,
@@ -118,9 +143,9 @@ def main(content):
             'most_common_word': most_common_words,
             'n_files': n_files,
             'ratio_files_and_messages': ratio_files_and_messages,
-            'nlinks': nlinks,
+            'n_links': n_links,
             'ratio_links_and_messages': ratio_links_and_messages,
-
+            'mpd': mpd
         }
 
-    print_info(users)
+    print_info_pretty(users)
