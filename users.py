@@ -142,19 +142,14 @@ def main(content, metadata):
         messages = get_messages(content, user)
         n_messages = len(messages)
         if(n_messages == 0):
-            n_files = ratio_files_and_messages = 0
             most_common_words = ''
-            n_links = 0
-            mpd = 0
+            n_files = ratio_files_and_messages = n_links = ratio_links_and_messages = mpd = 0
         else:
             most_common_words = get_most_common_words(messages)
-
             n_files = get_nfiles(messages)
             ratio_files_and_messages = get_ratio(n_messages, n_files)
-
             n_links = get_nlinks(messages)
             ratio_links_and_messages = get_ratio(n_messages, n_links)
-
             mpd = get_mpd(n_messages, metadata['days'])
 
         users[user] = {
