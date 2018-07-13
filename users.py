@@ -112,6 +112,9 @@ def print_info_pretty(users):
         'User', 'Gender', 'Messages', 'MCM', 'MPD', 'Files', '% Files', 'Links', '% Links'
     ]
     print(tabulate(all_users, headers=headers, tablefmt="grid"))
+    print('\n\tMCM: Most common word.')
+    print('\tMPD: Messages per day.')
+    print('\% Files and % Links: Files and/or links sent every 100 messages.\n')
 
 
 def main(content, metadata):
