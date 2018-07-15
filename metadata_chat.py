@@ -3,16 +3,20 @@ import datetime
 
 import print_data
 
-# Given the string `13/10/17`,for example. It returns the date
-
 
 def get_date(date_str):
+    '''
+    Given the string `13/10/17`,for example. It returns the date
+    '''
     return datetime.datetime.strptime(date_str, "%d/%m/%y")
 
-# Returns the number of days from the first message to the last message
+#
 
 
 def get_ndays(first_date, last_date):
+    '''
+    Returns the number of days from the first message to the last message
+    '''
     return (get_date(last_date) - get_date(first_date)).days + 1
 
 

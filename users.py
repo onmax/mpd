@@ -1,7 +1,6 @@
 import re
 import requests
 
-
 import print_data
 
 
@@ -71,12 +70,8 @@ def get_ratio(n_messages, elem):
 
 
 def get_n_emojis(messages):
-    emojis = []
-    regex = r"[\U00010000-\U0010ffff]"
-    for msg in messages:
-        e = re.finditer(regex, msg, re.MULTILINE | re.UNICODE)
-        emojis.append(e)
-    return len(emojis)
+    n = len(re.findall(r'[\U0001f600-\U0001f650]', ''.join(messages)))
+    return n
 
 
 def get_longest_message(messages):
