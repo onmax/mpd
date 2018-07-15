@@ -1,6 +1,8 @@
 import re
 import datetime
 
+import print_data
+
 # Given the string `13/10/17`,for example. It returns the date
 
 
@@ -30,5 +32,7 @@ def main(content):
         'days': get_ndays(first_day_date, last_day_date),
         'nmessages': len(content)
     }
-    print(metadata)
+
+    print_data.print_metadata(metadata)
+
     return metadata

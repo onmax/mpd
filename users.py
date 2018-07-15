@@ -1,7 +1,8 @@
 import re
 import requests
 
-from tabulate import tabulate
+
+import print_data
 
 
 def get_users(content):
@@ -61,16 +62,31 @@ def get_nfiles(messages):
             n += 1
     return n
 
-# Get the number of elem(files or links) sent every 100 messages
-
 
 def get_ratio(n_messages, elem):
+    '''
+    Return the number of elem(files or links) sent every 100 messages
+    '''
     return elem * 100 / n_messages
 
-# Get the most common word of a user
+
+def get_n_emojis(messages):
+    emojis = []
+    regex = r"[\U00010000-\U0010ffff]"
+    for msg in messages:
+        e = re.finditer(regex, msg, re.MULTILINE | re.UNICODE)
+        emojis.append(e)
+    return len(emojis)
+
+
+def get_longest_message(messages):
+    return max(messages, key=len)
 
 
 def get_most_common_words(messages):
+    '''
+    Creates the words list with all words from messages and then return the word that most repeat in the word list
+    '''
     words = []
     for x in messages:
         for y in x.split(' '):
@@ -88,51 +104,11 @@ def get_nlinks(messages):
 
 
 def get_mpd(n, days):
+    '''
+    Return the average of messages sent in a day
+    Note: mpd means messages per day 
+    '''
     return n / days
-
-
-def print_info(users):
-    print('\n')
-    print('Number of messages:')
-    for user in users:
-        print('\t' + user + '(' + users[user]['gender'] + '): ')
-        print('\t\t' + 'Messages: ' + str(users[user]['n_messages']))
-        print('\t\t' + 'Most common word: ' +
-              str(users[user]['most_common_word']))
-        print('\t\t' + 'MPD: ' + str(users[user]['mpd']))
-        print('\t\t' + 'Files sent: ' + str(users[user]['n_files']))
-        print('\t\t' + 'Files sent every 100 messages: ' +
-              str(round(users[user]['ratio_files_and_messages'], 2)) + " %")
-
-        print('\t\t' + 'Links sent: ' + str(users[user]['n_links']))
-        print('\t\t' + 'Links sent every 100 messages: ' +
-              str(round(users[user]['ratio_links_and_messages'], 2)) + " %")
-
-        print('\n')
-
-
-def print_info_pretty(users):
-    all_users = []
-    for user in users:
-        all_users.append([
-            user,
-            users[user]['gender'],
-            str(users[user]['n_messages']),
-            str(users[user]['most_common_word']),
-            str(round(users[user]['mpd'], 4)),
-            str(users[user]['n_files']),
-            str(round(users[user]['ratio_files_and_messages'], 2)),
-            str(users[user]['n_links']),
-            str(round(users[user]['ratio_links_and_messages'], 2))
-        ])
-
-    headers = [
-        'User', 'Gender', 'Messages', 'MCM', 'MPD', 'Files', '% Files', 'Links', '% Links'
-    ]
-    print(tabulate(all_users, headers=headers, tablefmt="grid"))
-    print('\n\tMCM: Most common word.')
-    print('\tMPD: Messages per day.')
-    print('\t% Files and % Links: Files and/or links sent every 100 messages.\n\n')
 
 
 def main(content, metadata):
@@ -145,6 +121,9 @@ def main(content, metadata):
             most_common_words = ''
             n_files = ratio_files_and_messages = n_links = ratio_links_and_messages = mpd = 0
         else:
+            longest_message = get_longest_message(messages)
+            len_longest_message = len(longest_message)
+            n_emojis = get_n_emojis(messages)
             most_common_words = get_most_common_words(messages)
             n_files = get_nfiles(messages)
             ratio_files_and_messages = get_ratio(n_messages, n_files)
@@ -156,6 +135,9 @@ def main(content, metadata):
             'gender': genders[i],
             'messages': messages,
             'n_messages': n_messages,
+            'longest_message': longest_message,
+            'len_longest_message': len_longest_message,
+            'n_emojis': n_emojis,
             'most_common_word': most_common_words,
             'n_files': n_files,
             'ratio_files_and_messages': ratio_files_and_messages,
@@ -164,4 +146,4 @@ def main(content, metadata):
             'mpd': mpd
         }
 
-    print_info_pretty(users)
+    print_data.print_info_table(users)
