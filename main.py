@@ -1,6 +1,8 @@
 import os.path
 import sys
 
+import print_data
+
 import users
 import metadata_chat
 
@@ -29,7 +31,18 @@ if __name__ == '__main__':
 
         content = get_content(sys.argv[1])
         metadata = metadata_chat.main(content)
-        users.main(content, metadata)
+        users = users.main(content, metadata)
+
+        if('--get-list-word' in sys.argv):
+            f = open('./chats/words.txt', 'w', encoding='utf8')
+            for user in users:
+                f.write(user + '\n')
+                f.write(
+                    str(users[user]['most_common_word']).strip('[]') + '\n')
+            f.close()
+
+        # print_data.print_metadata(metadata)
+        # print_data.print_info_table(users)
 
     else:
         print("You must enter a file path as an argument")

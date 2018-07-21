@@ -22,7 +22,7 @@ def print_user_info(users):
         print('\t' + user + '(' + users[user]['gender'] + '): ')
         print('\t\t' + 'Messages: ' + str(users[user]['n_messages']))
         print('\t\t' + 'Most common word: ' +
-              str(users[user]['most_common_word']))
+              str(users[user]['most_common_word'][0]))
         print('\t\t' + 'MPD: ' + str(users[user]['mpd']))
         print('\t\t' + 'Files sent: ' + str(users[user]['n_files']))
         print('\t\t' + 'Files sent every 100 messages: ' +
@@ -58,7 +58,7 @@ def print_info_table(users):
             user,
             users[user]['gender'],
             str(users[user]['n_messages']),
-            str(users[user]['most_common_word']),
+            str(users[user]['most_common_word'][0]),
             str(users[user]['len_longest_message']),
             str(users[user]['n_emojis']),
             str(round(users[user]['mpd'], 4)),

@@ -1,7 +1,6 @@
 import re
 import requests
-
-import print_data
+import collections
 
 
 def get_users(content):
@@ -78,15 +77,24 @@ def get_longest_message(messages):
     return max(messages, key=len)
 
 
-def get_most_common_words(messages):
+def get_words(messages):
     '''
-    Creates the words list with all words from messages and then return the word that most repeat in the word list
+    Returns the list of words by user
     '''
     words = []
     for x in messages:
         for y in x.split(' '):
             words.append(y)
-    return max(set(words), key=words.count)
+    return words
+
+
+def get_most_common_words(words):
+    '''
+    Return the word that most repeat word
+    '''
+    counter = collections.Counter(words)
+    order_words = counter.most_common()
+    return order_words
 
 
 def get_nlinks(messages):
@@ -119,7 +127,8 @@ def main(content, metadata):
             longest_message = get_longest_message(messages)
             len_longest_message = len(longest_message)
             n_emojis = get_n_emojis(messages)
-            most_common_words = get_most_common_words(messages)
+            words = get_words(messages)
+            most_common_words = get_most_common_words(words)
             n_files = get_nfiles(messages)
             ratio_files_and_messages = get_ratio(n_messages, n_files)
             n_links = get_nlinks(messages)
@@ -141,4 +150,4 @@ def main(content, metadata):
             'mpd': mpd
         }
 
-    print_data.print_info_table(users)
+    return users

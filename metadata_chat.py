@@ -1,8 +1,6 @@
 import re
 import datetime
 
-import print_data
-
 
 def get_date(date_str):
     '''
@@ -36,7 +34,5 @@ def main(content):
         'days': get_ndays(first_day_date, last_day_date),
         'nmessages': len(content)
     }
-
-    print_data.print_metadata(metadata)
 
     return metadata
