@@ -1,4 +1,4 @@
-import os.path
+import os
 import sys
 
 import print_data
@@ -41,8 +41,21 @@ if __name__ == '__main__':
                     str(users[user]['most_common_word']).strip('[]') + '\n')
             f.close()
 
-        # print_data.print_metadata(metadata)
-        # print_data.print_info_table(users)
+        if ('--save-users-messages' in sys.argv):
+            folder = "users-messages"
+            if os.path.exists(folder):
+                os.system("rm -r " + folder)
+            os.mkdir(folder)
+            with open(folder + "/messages.txt", "w", encoding='utf-8') as fd:
+                for user in users:
+                    fd.write(user + ":")
+                    for m in users[user]["messages"]:
+                        if "<Multimedia omitido>" not in m:
+                            fd.write(m.replace('\n', '') + ". ")
+                    fd.write("\n")
+
+        print_data.print_metadata(metadata)
+        print_data.print_info_table(users)
 
     else:
         print("You must enter a file path as an argument")
